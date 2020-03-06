@@ -16,7 +16,7 @@ function mydate(str)
    return "$(Dates.day(d))-$(Dates.monthname(d))-$(Dates.year(d))"
 end
 
-##
+#
 
 function smooth(s::Vector, k::Vector)
    @assert isodd(length(k)) "k should have odd length"
@@ -33,7 +33,7 @@ function smooth(s::Vector, k::Vector)
    return sout
 end
 
-##
+#
 
 # ###########################################
 #
@@ -107,6 +107,8 @@ run(`sips -s format JPEG confirmed.png --out confirmed.jpg`)
 
 minimum_cases = 50
 ngroup = 3
+days_previous = 15
+smkernel = [0.1, 0.3, 0.7, 0.3, 0.1]
 
 using PyCall
 hs      = Array{PyObject}(undef, 0)   # line handles
