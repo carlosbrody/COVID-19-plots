@@ -1,5 +1,5 @@
 using DelimitedFiles
-dname = "../COVID-19/csse_covid_19_data/csse_covid_19_time_series"
+dname = "../../COVID-19/csse_covid_19_data/csse_covid_19_time_series"
 fname = "time_series_19-covid-Confirmed.csv"
 A  = readdlm("$dname/$fname", ',');
 
@@ -108,13 +108,13 @@ run(`sips -s format JPEG confirmed.png --out confirmed.jpg`)
 minimum_cases = 50
 ngroup = 3
 days_previous = 15
-smkernel = [0.1, 0.3, 0.7, 0.3, 0.1]
+smkernel = [0.3, 0.7, 0.3]
 
 using PyCall
 hs      = Array{PyObject}(undef, 0)   # line handles
 
 i = 1; f=1;
-while i <= length(paises)
+while i <= 3
    global i, f
    figure(2); clf(); println()
    plotted = Array{String}(undef, 0)     # plotted country strings
@@ -123,14 +123,14 @@ while i <= length(paises)
       myconf = confirmed[i,:]
       myconf[myconf.<minimum_cases] .= NaN
 
-      mratio = myconf[2:end]./myconf[1:end-1]
+      global mratio = myconf[2:end]./myconf[1:end-1]
       mratio = mratio[end-days_previous:end]
       u = findall(.!isnan.(mratio))
 
-      dias = 1:size(A,2)-4
-      dias[end-days_previous:end] .- dias[end]
+      global dias = 1:size(A,2)-4
+      dias = dias[end-days_previous:end] .- dias[end]
 
-      h = plot(dias[u], mratio[u], "o-", label=pais)[1]
+      h = plot(dias[u], smooth(mratio[u], smkernel), "o-", label=pais)[1]
       if length(u)>0
          global hs = vcat(hs, h)
          plotted = vcat(plotted, pais)
@@ -152,7 +152,7 @@ while i <= length(paises)
       h = gca().get_xticklabels()
       for i=1:length(h)
          if h[i].get_position()[1] == 0.0
-            h[i].set_text(A[1,end])
+            h[i].set_text(mydate(A[1,end]))
          end
       end
       gca().set_xticklabels(h)
