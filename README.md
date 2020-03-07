@@ -9,7 +9,7 @@ The first plot shows the percentage daily growth in number of confirmed cases fo
 Notable trends include South Korea's gradual slowing of it's growth rate, and the fact that although Japan's growth rate has been much smaller than most other countries, it has held steady. Caseloads growing at a contsant exponential rate  correspond to a horizontal line in this plot. In other words, although growth rate in Japan is comparatively slower than others, it is still exponential growth.
 
 
-<img src="src/multiplicative_factor_1.jpg" width="1000"> 
+<img src="src/multiplicative_factor_1.jpg" width="1200"> 
 
 
 ### Cumulative number of confirmed cases per country
