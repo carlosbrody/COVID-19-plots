@@ -14,7 +14,12 @@ Notable trends include South Korea's gradual slowing of it's growth rate, and th
 
 ### Cumulative number of confirmed cases per country
 
+This plot shows total number of confirmed cases, for the same countries as the first plot (same color code also). Since the vertical axis is logarithmic, percentage daily growth (in the first plot) is proportional to the slope of the lines in this plot.
 
 <img src="src/confirmed.jpg" width="1000">
 
+
+### Update frequency
+
+Although the [Johns Hopkins COVID-19 dashboard](https://gisanddata.maps.arcgis.com/apps/opsdashboard/index.html#/bda7594740fd40299423467b48e9ecf6) is updated frequently, they update their [database](https://github.com/CSSEGISandData/COVID-19) with the time series only once a day. I will likely update these once a day also.
 
