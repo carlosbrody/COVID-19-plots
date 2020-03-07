@@ -50,7 +50,7 @@ end
 
 
 
-days_previous = 10
+days_previous = 15
 
 confirmed = Array{Float64}(undef, length(paises), size(A,2)-4)
 
@@ -107,7 +107,7 @@ savefig("confirmed.png")
 run(`sips -s format JPEG confirmed.png --out confirmed.jpg`)
 
 
-##
+#
 # ###########################################
 #
 #  MULTIPLICATIVE CHANGE
@@ -117,8 +117,7 @@ run(`sips -s format JPEG confirmed.png --out confirmed.jpg`)
 
 minimum_cases = 50
 ngroup = 10
-days_previous = 10
-smkernel = [0.3, 0.7, 0.3]
+smkernel = [0.1, 0.4, 0.7, 0.4, 0.1]
 
 using PyCall
 hs      = Array{PyObject}(undef, 0)   # line handles
@@ -157,7 +156,7 @@ while i <= 3
       gca().legend(hs, plotted, fontsize=legendfontsize)
       xlabel("days from today", fontname=fontname, fontsize=fontsize)
       ylabel("% daily growth", fontname=fontname, fontsize=fontsize)
-      title("% daily growth in cumulative confirmed cases\n(smoothed with a +/- 1-day moving average)",
+      title("% daily growth in cumulative confirmed COVID-19 cases\n(smoothed with a +/- 1-day moving average; $minimum_cases cases minimum)",
          fontname="Helvetica Neue", fontsize=20)
       PyPlot.show(); gcf().canvas.flush_events()  # make graphics are ready to ask for tick labels
       h = gca().get_xticklabels()
