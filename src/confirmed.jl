@@ -2,10 +2,16 @@ using DelimitedFiles
 dname = "../../COVID-19/csse_covid_19_data/csse_covid_19_time_series"
 fname = "time_series_19-covid-Confirmed.csv"
 A  = readdlm("$dname/$fname", ',');
+a = findall(A[:,5:end] .== "")
+for i=1:length(a)
+   A[a[i][1], a[i][2]+4] = A[a[i][1], a[i][2]+3]
+end
 
 paises = ["US", "South Korea", "Switzerland", "Italy", "Germany", "Iran",
-   "France", "Spain", "UK", "Greece"]
+   "France", "Spain", "UK", "Greece", "Japan"]
 
+fontname = "Helvetica Neue"
+fontsize = 20
 
 """
    mydate(str)
@@ -80,10 +86,10 @@ for i=1:length(paises)
    println("$pais = $(confirmed[i,end])")
 end
 
-gca().legend()
-xlabel("days from today")
-ylabel("confirmed cases")
-title("Confirmed COVID-19 cases in selected countries")
+gca().legend(fontsize=fontsize-8)
+xlabel("days", fontsize=fontsize, fontname=fontname)
+ylabel("confirmed cases", fontsize=fontsize, fontname=fontname)
+title("Confirmed COVID-19 cases in selected countries", fontsize=fontsize, fontname=fontname)
 gca().set_yticks([1, 10, 100, 1000])
 gca().set_yticklabels(["1", "10", "100", "1000"])
 h = gca().get_xticklabels()
@@ -94,10 +100,13 @@ for i=1:length(h)
 end
 gca().set_xticklabels(h)
 grid("on")
+gca().tick_params(labelsize=16)
+
 savefig("confirmed.png")
 run(`sips -s format JPEG confirmed.png --out confirmed.jpg`)
 
 
+##
 # ###########################################
 #
 #  MULTIPLICATIVE CHANGE
@@ -106,8 +115,8 @@ run(`sips -s format JPEG confirmed.png --out confirmed.jpg`)
 
 
 minimum_cases = 50
-ngroup = 3
-days_previous = 15
+ngroup = 10
+days_previous = 10
 smkernel = [0.3, 0.7, 0.3]
 
 using PyCall
@@ -123,7 +132,7 @@ while i <= 3
       myconf = confirmed[i,:]
       myconf[myconf.<minimum_cases] .= NaN
 
-      global mratio = myconf[2:end]./myconf[1:end-1]
+      global mratio = (myconf[2:end]./myconf[1:end-1] .- 1) .* 100
       mratio = mratio[end-days_previous:end]
       u = findall(.!isnan.(mratio))
 
@@ -144,10 +153,11 @@ while i <= 3
    end
 
    if ~isempty(plotted)
-      gca().legend(hs, plotted)
-      xlabel("days from today")
-      ylabel("daily multiplicative growth factor")
-      title("Multiplicative factor, confirmed cases relative to previous day")
+      gca().legend(hs, plotted, fontsize=fontsize-8)
+      xlabel("days from today", fontname="Helvetica Neue", fontsize=20)
+      ylabel("% daily growth", fontname="Helvetica Neue", fontsize=20)
+      title("% daily growth in cumulative confirmed cases",
+         fontname="Helvetica Neue", fontsize=20)
       PyPlot.show(); gcf().canvas.flush_events()  # make graphics are ready to ask for tick labels
       h = gca().get_xticklabels()
       for i=1:length(h)
@@ -156,6 +166,7 @@ while i <= 3
          end
       end
       gca().set_xticklabels(h)
+      gca().tick_params(labelsize=16)
       grid("on")
       figname = "multiplicative_factor"
       savefig("$(figname)_$f.png")
