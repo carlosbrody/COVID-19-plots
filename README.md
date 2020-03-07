@@ -14,7 +14,7 @@ Notable trends include South Korea's gradual slowing of it's growth rate, and th
 
 ### Cumulative number of confirmed cases per country
 
-This plot shows total number of confirmed cases, for the same countries as the first plot (same color code also). Since the vertical axis is logarithmic, percentage daily growth (in the first plot) is proportional to the slope of the lines in this plot.
+This plot shows total number of confirmed cases, for the same countries as the first plot (same color code also). Since the vertical axis is logarithmic, percentage daily growth (in the first plot) is proportional to the slope of the lines in this plot. China has both by far the largest caseload and by far the slowest growth rate.
 
 <img src="src/confirmed.jpg" width="1000">
 
