@@ -10,8 +10,9 @@ end
 paises = ["US", "South Korea", "Switzerland", "Italy", "Germany", "Iran",
    "France", "Spain", "UK", "Greece", "Japan"]
 
-fontname = "Helvetica Neue"
-fontsize = 20
+fontname       = "Helvetica Neue"
+fontsize       = 20
+legendfontsize = 13
 
 """
    mydate(str)
@@ -86,7 +87,7 @@ for i=1:length(paises)
    println("$pais = $(confirmed[i,end])")
 end
 
-gca().legend(fontsize=fontsize-8)
+gca().legend(fontsize=legendfontsize)
 xlabel("days", fontsize=fontsize, fontname=fontname)
 ylabel("confirmed cases", fontsize=fontsize, fontname=fontname)
 title("Confirmed COVID-19 cases in selected countries", fontsize=fontsize, fontname=fontname)
@@ -153,10 +154,10 @@ while i <= 3
    end
 
    if ~isempty(plotted)
-      gca().legend(hs, plotted, fontsize=fontsize-8)
-      xlabel("days from today", fontname="Helvetica Neue", fontsize=20)
-      ylabel("% daily growth", fontname="Helvetica Neue", fontsize=20)
-      title("% daily growth in cumulative confirmed cases",
+      gca().legend(hs, plotted, fontsize=legendfontsize)
+      xlabel("days from today", fontname=fontname, fontsize=fontsize)
+      ylabel("% daily growth", fontname=fontname, fontsize=fontsize)
+      title("% daily growth in cumulative confirmed cases\n(smoothed with a +/- 1-day moving average)",
          fontname="Helvetica Neue", fontsize=20)
       PyPlot.show(); gcf().canvas.flush_events()  # make graphics are ready to ask for tick labels
       h = gca().get_xticklabels()
