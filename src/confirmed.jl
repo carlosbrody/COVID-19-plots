@@ -8,7 +8,7 @@ for i=1:length(a)
 end
 
 paises = ["US", "South Korea", "Switzerland", "Italy", "Germany", "Iran",
-   "France", "Spain", "UK", "Greece", "Japan"]
+   "France", "Spain", "UK", "Greece", "Japan", "Mainland China"]
 
 fontname       = "Helvetica Neue"
 fontsize       = 20
@@ -70,9 +70,11 @@ for i = 1:length(paises)
    confirmed[i,:] = my_confirmed
 end
 v = sortperm(confirmed[:,end])[end:-1:1]
+# We're going to put China last for now, just to keep plot colors
+# consistent with previous versions
+v = [v[1:end-1]; v[end]]
 paises = paises[v]
 confirmed = confirmed[v,:]
-
 
 
 figure(1); clf(); println()
@@ -116,7 +118,7 @@ run(`sips -s format JPEG confirmed.png --out confirmed.jpg`)
 
 
 minimum_cases = 50
-ngroup = 10
+ngroup = 20
 smkernel = [0.1, 0.4, 0.7, 0.4, 0.1]
 
 using PyCall
