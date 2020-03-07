@@ -6,7 +6,7 @@ I was curious as to what these plots would look like. Thanks to the open availab
 
 The first plot shows the percentage daily growth in number of confirmed cases for a selected set of countries. For each country, the data plot starts after 50 cases were reached (it is too noisy before that). Note that net number of confirmed cases can change over time due to many factors, including test availability, test applications, reporting accuracy, etc. These plots simply show the available data as is.
 
-Notable trends include South Korea's gradual slowing of it's growth rate, and the fact that although Japan's growth rate has been much smaller than most other countries, it has held steady. Caseloads growing at a contsant exponential rate  correspond to a horizontal line in this plot. In other words, although growth rate in Japan is comparatively slower than others, it is still exponential growth.
+Notable trends include South Korea's gradual slowing of it's growth rate, and the fact that although Japan's growth rate has been much smaller than most other countries, it has held steady. Caseloads growing at a contsant exponential rate  correspond to a horizontal line in this plot. In other words, although growth rate in Japan is comparatively slower than others, it is still exponential growth. Mainland China is the orange line at the bottom, near zero.
 
 
 <img src="src/multiplicative_factor_1.jpg" width="1200"> 
@@ -14,7 +14,7 @@ Notable trends include South Korea's gradual slowing of it's growth rate, and th
 
 ### Cumulative number of confirmed cases per country
 
-This plot shows total number of confirmed cases, for the same countries as the first plot (same color code also). Since the vertical axis is logarithmic, percentage daily growth (in the first plot) is proportional to the slope of the lines in this plot. China has both by far the largest caseload and by far the slowest growth rate.
+This plot shows total number of confirmed cases, for the same countries as the first plot (same color code also). Since the vertical axis is logarithmic, percentage daily growth (in the first plot) is proportional to the slope of the lines in this plot. China is the orange line at the top. It has both by far the largest caseload and by far the slowest growth rate.
 
 <img src="src/confirmed.jpg" width="1000">
 
