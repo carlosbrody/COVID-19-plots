@@ -7,8 +7,8 @@ for i=1:length(a)
    A[a[i][1], a[i][2]+4] = A[a[i][1], a[i][2]+3]
 end
 
-paises = ["US", "South Korea", "Switzerland", "Italy", "Germany", "Iran",
-   "France", "Spain", "UK", "Greece", "Japan", "Mainland China"]
+paises = ["South Korea", "Iran", "Italy", "Germany", "France", "Japan",
+   "Spain", "US", "Switzerland", "UK", "Greece", "Mainland China"]
 
 fontname       = "Helvetica Neue"
 fontsize       = 20
@@ -50,7 +50,7 @@ end
 
 
 
-days_previous = 15
+days_previous = 16
 
 confirmed = Array{Float64}(undef, length(paises), size(A,2)-4)
 
@@ -69,12 +69,16 @@ for i = 1:length(paises)
    my_confirmed = sum(my_confirmed, dims=1)[:]
    confirmed[i,:] = my_confirmed
 end
-v = sortperm(confirmed[:,end])[end:-1:1]
-# We're going to put China last for now, just to keep plot colors
-# consistent with previous versions
-v = [v[1:end-1]; v[end]]
-paises = paises[v]
-confirmed = confirmed[v,:]
+
+# We're not going to sort countries-- use the order in paises, so the order,
+# and colors, is consistent from day to day
+# Hence commenting out sorting:
+# v = sortperm(confirmed[:,end])[end:-1:1]
+# # We're going to put China last for now, just to keep plot colors
+# # consistent with previous versions
+# v = [v[2:end]; v[1]]
+# paises = paises[v]
+# confirmed = confirmed[v,:]
 
 
 figure(1); clf(); println()
@@ -93,8 +97,8 @@ gca().legend(fontsize=legendfontsize)
 xlabel("days", fontsize=fontsize, fontname=fontname)
 ylabel("confirmed cases", fontsize=fontsize, fontname=fontname)
 title("Confirmed COVID-19 cases in selected countries", fontsize=fontsize, fontname=fontname)
-gca().set_yticks([1, 10, 100, 1000])
-gca().set_yticklabels(["1", "10", "100", "1000"])
+gca().set_yticks([1, 10, 100, 1000, 10000])
+gca().set_yticklabels(["1", "10", "100", "1000", "10000"])
 h = gca().get_xticklabels()
 for i=1:length(h)
    if h[i].get_position()[1] == 0.0
@@ -156,7 +160,7 @@ while i <= 3
 
    if ~isempty(plotted)
       gca().legend(hs, plotted, fontsize=legendfontsize)
-      xlabel("days from today", fontname=fontname, fontsize=fontsize)
+      xlabel("days", fontname=fontname, fontsize=fontsize)
       ylabel("% daily growth", fontname=fontname, fontsize=fontsize)
       title("% daily growth in cumulative confirmed COVID-19 cases\n(smoothed with a +/- 1-day moving average; $minimum_cases cases minimum)",
          fontname="Helvetica Neue", fontsize=20)
