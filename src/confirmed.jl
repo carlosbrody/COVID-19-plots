@@ -108,7 +108,8 @@ end
 gca().set_xticklabels(h)
 grid("on")
 gca().tick_params(labelsize=16)
-gca().tick_params(labeltop=false, labelright=true)
+gca().yaxis.tick_right()
+gca().tick_params(labeltop=false, labelleft=true)
 
 savefig("confirmed.png")
 run(`sips -s format JPEG confirmed.png --out confirmed.jpg`)
