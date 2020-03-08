@@ -108,6 +108,7 @@ end
 gca().set_xticklabels(h)
 grid("on")
 gca().tick_params(labelsize=16)
+gca().tick_params(labeltop=false, labelright=true)
 
 savefig("confirmed.png")
 run(`sips -s format JPEG confirmed.png --out confirmed.jpg`)
@@ -174,6 +175,7 @@ while i <= 3
       gca().set_xticklabels(h)
       gca().tick_params(labelsize=16)
       grid("on")
+      gca().tick_params(labeltop=false, labelright=true)
       figname = "multiplicative_factor"
       savefig("$(figname)_$f.png")
       run(`sips -s format JPEG $(figname)_$f.png --out $(figname)_$f.jpg`)
