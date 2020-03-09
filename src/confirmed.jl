@@ -2,13 +2,26 @@ using DelimitedFiles
 dname = "../../COVID-19/csse_covid_19_data/csse_covid_19_time_series"
 fname = "time_series_19-covid-Confirmed.csv"
 A  = readdlm("$dname/$fname", ',');
+# --- Special fix for occasional empty entries: copy previous day
 a = findall(A[:,5:end] .== "")
 for i=1:length(a)
    A[a[i][1], a[i][2]+4] = A[a[i][1], a[i][2]+3]
 end
+# --- end fix
+
+# special code for all countries other than China:
+other = "World other than China"
+other_kwargs = Dict(:linewidth=>12, :color=>"gray", :alpha=>0.3)
+
+
+days_previous = 17
 
 paises = ["South Korea", "Iran", "Italy", "Germany", "France", "Japan",
-   "Spain", "US", "Switzerland", "UK", "Greece", "Mainland China"]
+   "Spain", "US", "Switzerland", "UK", "Greece", "Mainland China",
+   "World other than China"]
+
+
+
 
 fontname       = "Helvetica Neue"
 fontsize       = 20
@@ -50,7 +63,6 @@ end
 
 
 
-days_previous = 16
 
 confirmed = Array{Float64}(undef, length(paises), size(A,2)-4)
 
@@ -60,7 +72,11 @@ for i = 1:length(paises)
    pais = paises[i]
 
    # Find all rows for this country
-   crows = findall(A[:,2] .== pais)
+   if pais != other
+      crows = findall(A[:,2] .== pais)
+   else
+      crows = findall(A[2:end,2] .!= "Mainland China") .+ 1
+   end
 
    # daily count starts in column 5; turn it into Float64s
    my_confirmed = Array{Float64}(A[crows,5:end])
@@ -88,8 +104,13 @@ for i=1:length(paises)
    pais = paises[i]
 
    dias = 1:size(A,2)-4
-   semilogy(dias[end-days_previous:end] .- dias[end],
-      confirmed[i, end-days_previous:end], "o-", label=pais)
+   if pais != other
+      semilogy(dias[end-days_previous:end] .- dias[end],
+         confirmed[i, end-days_previous:end], "o-", label=pais)
+   else
+      semilogy(dias[end-days_previous:end] .- dias[end],
+         confirmed[i, end-days_previous:end], "-", label=pais; other_kwargs...)
+   end
    println("$pais = $(confirmed[i,end])")
 end
 
@@ -97,8 +118,8 @@ gca().legend(fontsize=legendfontsize)
 xlabel("days", fontsize=fontsize, fontname=fontname)
 ylabel("confirmed cases", fontsize=fontsize, fontname=fontname)
 title("Confirmed COVID-19 cases in selected countries", fontsize=fontsize, fontname=fontname)
-gca().set_yticks([1, 10, 100, 1000, 10000])
-gca().set_yticklabels(["1", "10", "100", "1000", "10000"])
+gca().set_yticks([1, 4, 10, 40, 100, 400, 1000, 4000, 10000])
+gca().set_yticklabels(["1", "4", "10", "40", "100", "400", "1000", "4000", "10000"])
 h = gca().get_xticklabels()
 for i=1:length(h)
    if h[i].get_position()[1] == 0.0
@@ -147,7 +168,12 @@ while i <= 3
       global dias = 1:size(A,2)-4
       dias = dias[end-days_previous:end] .- dias[end]
 
-      h = plot(dias[u], smooth(mratio[u], smkernel), "o-", label=pais)[1]
+      if pais != other
+         h = plot(dias[u], smooth(mratio[u], smkernel), "o-", label=pais)[1]
+      else
+         h = plot(dias[u], smooth(mratio[u], smkernel), "-", label=pais;
+            other_kwargs...)[1]
+      end
       if length(u)>0
          global hs = vcat(hs, h)
          plotted = vcat(plotted, pais)
@@ -173,6 +199,7 @@ while i <= 3
             h[i].set_text(mydate(A[1,end]))
          end
       end
+      gca().set_yticks(0:10:110)
       gca().set_xticklabels(h)
       gca().tick_params(labelsize=16)
       grid("on")
