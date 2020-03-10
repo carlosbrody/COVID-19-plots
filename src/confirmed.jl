@@ -67,10 +67,14 @@ end
 confirmed = Array{Float64}(undef, length(paises), size(A,2)-4)
 
 
+"""
+   pais2conf(pais::String)
 
-for i = 1:length(paises)
-   pais = paises[i]
-
+   Given a string representing a country, returns a numeric vector of cumulative
+   confirmed cases as a function of days. ***ASSUMES MATRIX A HAS BEEN
+   POPULATED WITH A READ FROM TEH CSV FILE***
+"""
+function pais2conf(pais::String)
    # Find all rows for this country
    if pais != other
       crows = findall(A[:,2] .== pais)
@@ -83,7 +87,14 @@ for i = 1:length(paises)
 
    # Add all rows for the country
    my_confirmed = sum(my_confirmed, dims=1)[:]
-   confirmed[i,:] = my_confirmed
+
+   return my_confirmed
+end
+
+for i = 1:length(paises)
+   pais = paises[i]
+
+   confirmed[i,:] = pais2conf(pais)
 end
 
 # We're not going to sort countries-- use the order in paises, so the order,
@@ -118,8 +129,9 @@ gca().legend(fontsize=legendfontsize)
 xlabel("days", fontsize=fontsize, fontname=fontname)
 ylabel("confirmed cases", fontsize=fontsize, fontname=fontname)
 title("Confirmed COVID-19 cases in selected countries", fontsize=fontsize, fontname=fontname)
-gca().set_yticks([1, 4, 10, 40, 100, 400, 1000, 4000, 10000])
-gca().set_yticklabels(["1", "4", "10", "40", "100", "400", "1000", "4000", "10000"])
+gca().set_yticks([1, 4, 10, 40, 100, 400, 1000, 4000, 10000, 40000])
+gca().set_yticklabels(["1", "4", "10", "40", "100", "400", "1000",
+   "4000", "10000", "40000"])
 h = gca().get_xticklabels()
 for i=1:length(h)
    if h[i].get_position()[1] == 0.0
