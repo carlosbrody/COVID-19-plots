@@ -1,3 +1,5 @@
+include("utils.jl")
+
 using DelimitedFiles
 dname = "../../COVID-19/csse_covid_19_data/csse_covid_19_time_series"
 fname = "time_series_19-covid-Confirmed.csv"
@@ -17,11 +19,12 @@ other_kwargs = Dict(:linewidth=>12, :color=>"gray", :alpha=>0.3)
 days_previous = 17
 
 paises = ["South Korea", "Iran", "Italy", "Germany", "France", "Japan",
-   "Spain", "US", "Switzerland", "UK", "Greece", "Mainland China",
+   "Spain", "US", "Switzerland", "UK", "Greece", "Mainland China", # "Other European Countries",
    "World other than China"]
 
-
-
+oeurope = ["Netherlands", "Sweden", "Belgium", "Norway", "Austria", "Denmark"]
+other_europe = "Other European Countries"
+other_europe_kwargs = Dict(:linewidth=>6, :color=>"gray", :alpha=>0.3)
 
 fontname       = "Helvetica Neue"
 fontsize       = 20
@@ -76,10 +79,12 @@ confirmed = Array{Float64}(undef, length(paises), size(A,2)-4)
 """
 function pais2conf(pais::String)
    # Find all rows for this country
-   if pais != other
-      crows = findall(A[:,2] .== pais)
-   else
+   if pais == other
       crows = findall(A[2:end,2] .!= "Mainland China") .+ 1
+   elseif pais == other_europe
+      crows = findall(map(x -> in(x, oeurope), A[:,2]))
+   else
+      crows = findall(A[:,2] .== pais)
    end
 
    # daily count starts in column 5; turn it into Float64s
@@ -115,12 +120,15 @@ for i=1:length(paises)
    pais = paises[i]
 
    dias = 1:size(A,2)-4
-   if pais != other
-      semilogy(dias[end-days_previous:end] .- dias[end],
-         confirmed[i, end-days_previous:end], "o-", label=pais)
-   else
+   if pais == other
       semilogy(dias[end-days_previous:end] .- dias[end],
          confirmed[i, end-days_previous:end], "-", label=pais; other_kwargs...)
+   elseif pais==other_europe
+      semilogy(dias[end-days_previous:end] .- dias[end],
+         confirmed[i, end-days_previous:end], "--", label=pais; other_europe_kwargs...)
+   else
+      semilogy(dias[end-days_previous:end] .- dias[end],
+         confirmed[i, end-days_previous:end], "o-", label=pais)
    end
    println("$pais = $(confirmed[i,end])")
 end
@@ -160,6 +168,13 @@ minimum_cases = 50
 ngroup = 20
 smkernel = [0.1, 0.4, 0.7, 0.4, 0.1]
 
+interest_explanation = """
+How to read this plot: Think of the vertical axis values like interest rate per day being paid into an account. The account is not
+money, it is cumulative number of cases. We want that interest rate as low as possible. A horizontal flat line on this plot is like
+steady compound interest, i.e., it is exponential growth. Stopping the disease means the growth rate has to go all the way down to
+zero. The horizontal axis shows days before the date on the bottom right.
+"""
+
 using PyCall
 hs      = Array{PyObject}(undef, 0)   # line handles
 
@@ -180,11 +195,14 @@ while i <= 3
       global dias = 1:size(A,2)-4
       dias = dias[end-days_previous:end] .- dias[end]
 
-      if pais != other
-         h = plot(dias[u], smooth(mratio[u], smkernel), "o-", label=pais)[1]
-      else
+      if pais == other
          h = plot(dias[u], smooth(mratio[u], smkernel), "-", label=pais;
             other_kwargs...)[1]
+      elseif pais == other_europe
+         h = plot(dias[u], smooth(mratio[u], smkernel), "--", label=pais;
+            other_europe_kwargs...)[1]
+      else
+         h = plot(dias[u], smooth(mratio[u], smkernel), "o-", label=pais)[1]
       end
       if length(u)>0
          global hs = vcat(hs, h)
@@ -216,6 +234,12 @@ while i <= 3
       gca().tick_params(labelsize=16)
       grid("on")
       gca().tick_params(labeltop=false, labelright=true)
+
+      axisHeightChange(0.85, lock="t"); axisMove(0, 0.03)
+      t = text(mean(xlim()), -0.23*(ylim()[2]-ylim()[1]), interest_explanation,
+         fontname=fontname, fontsize=16,
+         horizontalalignment = "center", verticalalignment="top")
+
       figname = "multiplicative_factor"
       savefig("$(figname)_$f.png")
       run(`sips -s format JPEG $(figname)_$f.png --out $(figname)_$f.jpg`)
