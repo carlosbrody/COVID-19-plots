@@ -18,7 +18,11 @@ This plot shows total number of confirmed cases, for the same countries as the f
 
 <img src="src/confirmed.jpg" width="1000">
 
-### 2020-March-06 : One possible conclusion
+#### 2020-March-09 : Signs of a trend?
+
+Spain had a terrible day, Italy continues to rage unabated, but in the rest of Europe... noise? changes in testing? Or the beginning signs of a possibly encouraging trend? 
+
+#### 2020-March-06 : One possible conclusion
 
 Three of the countries with the largest caseloads as of 6-March-2020, namely China, South Korea, and Italy, are also countries with some of the smallest growth rates, specially China and South Korea. Their experience has clearly led them to learn something about how to deal with COVID-19. But the rest of the world hasn't learned from *them*: almost everyone starts at growth rates much higher than the current growth rates in those countries.
 
