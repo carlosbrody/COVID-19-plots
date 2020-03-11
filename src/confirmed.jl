@@ -18,7 +18,7 @@ for i=1:length(a)
       A[a[i][1], a[i][2]+4] = A[a[i][1], a[i][2]+3]
    else
       # if US, enter zero, county rows are now superseded and subsumed in whole-state rows
-      A[a[i][1], a[i][2]+4] = 0     
+      A[a[i][1], a[i][2]+4] = 0
    end
 end
 # --- end fix
@@ -43,6 +43,7 @@ fontname       = "Helvetica Neue"
 fontsize       = 20
 legendfontsize = 13
 
+markerorder = ["o", "x", "P", "d"]
 
 
 """
@@ -101,7 +102,7 @@ confirmed = Array{Float64}(undef, length(paises), size(A,2)-4)
    confirmed cases as a function of days. ***ASSUMES MATRIX A HAS BEEN
    POPULATED WITH A READ FROM TEH CSV FILE***
 """
-function pais2conf(pais::String)
+function pais2conf(pais::String; region::String="")
    # Find all rows for this country
    if pais == other
       crows = findall(A[2:end,2] .!= "Mainland China") .+ 1
@@ -109,6 +110,11 @@ function pais2conf(pais::String)
       crows = findall(map(x -> in(x, oeurope), A[:,2]))
    else
       crows = findall(A[:,2] .== pais)
+      if !isempty(region)
+         rrows1 = findall(map(x -> occursin(", $region", x), A[:,1]))
+         rrows2 = findall(A[:,1] .== abbrev2StateName[region])
+         crows  = intersect(crows, vcat(rrows1, rrows2))
+      end
    end
 
    # daily count starts in column 5; turn it into Float64s
@@ -119,6 +125,8 @@ function pais2conf(pais::String)
 
    return my_confirmed
 end
+
+
 
 for i = 1:length(paises)
    pais = paises[i]
@@ -152,15 +160,16 @@ for i=1:length(paises)
          confirmed[i, end-days_previous:end], "--", label=pais; other_europe_kwargs...)
    else
       semilogy(dias[end-days_previous:end] .- dias[end],
-         confirmed[i, end-days_previous:end], "o-", label=pais)
+         confirmed[i, end-days_previous:end], "-", label=pais,
+         marker = markerorder[Int64(ceil(i/10))])
    end
    println("$pais = $(confirmed[i,end])")
 end
 
 gca().legend(fontsize=legendfontsize)
 xlabel("days", fontsize=fontsize, fontname=fontname)
-ylabel("confirmed cases", fontsize=fontsize, fontname=fontname)
-title("Confirmed COVID-19 cases in selected countries", fontsize=fontsize, fontname=fontname)
+ylabel("cumulative confirmed cases", fontsize=fontsize, fontname=fontname)
+title("Cumulative onfirmed COVID-19 cases in selected countries", fontsize=fontsize, fontname=fontname)
 gca().set_yticks([1, 4, 10, 40, 100, 400, 1000, 4000, 10000, 40000])
 gca().set_yticklabels(["1", "4", "10", "40", "100", "400", "1000",
    "4000", "10000", "40000"])
@@ -175,6 +184,11 @@ grid("on")
 gca().tick_params(labelsize=16)
 gca().yaxis.tick_right()
 gca().tick_params(labeltop=false, labelleft=true)
+
+x = xlim()[2] + 0.1*(xlim()[2] - xlim()[1])
+y = exp(log(ylim()[1]) - 0.1*(log(ylim()[2]) - log(ylim()[1])))
+t = text(x, y, sourcestring, fontname=fontname, fontsize=13,
+   verticalalignment="top", horizontalalignment="right")
 
 savefig("confirmed.png")
 run(`sips -s format JPEG confirmed.png --out confirmed.jpg`)
@@ -198,6 +212,8 @@ money, it is cumulative number of cases. We want that interest rate as low as po
 steady compound interest, i.e., it is exponential growth. Stopping the disease means the growth rate has to go all the way down to
 zero. The horizontal axis shows days before the date on the bottom right.
 """
+
+sourcestring = "source: https://github.com/carlosbrody/COVID-19-plots"
 
 using PyCall
 hs      = Array{PyObject}(undef, 0)   # line handles
@@ -226,7 +242,8 @@ while i <= 3
          h = plot(dias[u], smooth(mratio[u], smkernel), "--", label=pais;
             other_europe_kwargs...)[1]
       else
-         h = plot(dias[u], smooth(mratio[u], smkernel), "o-", label=pais)[1]
+         h = plot(dias[u], smooth(mratio[u], smkernel), "-", label=pais,
+            marker = markerorder[Int64(ceil(i/10))])[1]
       end
       if length(u)>0
          global hs = vcat(hs, h)
@@ -263,6 +280,11 @@ while i <= 3
       t = text(mean(xlim()), -0.23*(ylim()[2]-ylim()[1]), interest_explanation,
          fontname=fontname, fontsize=16,
          horizontalalignment = "center", verticalalignment="top")
+
+      x = xlim()[2] + 0.1*(xlim()[2] - xlim()[1])
+      y = ylim()[1] - 0.1*(ylim()[2] - ylim()[1])
+      t = text(x, y, sourcestring, fontname=fontname, fontsize=13,
+         verticalalignment="top", horizontalalignment="right")
 
       figname = "multiplicative_factor"
       savefig("$(figname)_$f.png")

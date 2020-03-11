@@ -2,6 +2,22 @@ module CarlosUtils
 
 export mydate, smooth, axisWidthChange, axisHeightChange, axisMove
 
+export stateName2Abbrev, abbrev2StateName
+
+stateName2Abbrev = Dict(
+    "New Jersey"    => "NJ",
+    "California"    => "CA",
+    "Florida"       => "FL",
+    "Washington"    => "WA",
+    "New York"      => "NY",
+    "Texas"         => "TX",
+    "Illinois"      => "IL",
+    "Connecticut"   => "CT"
+)
+
+abbrev2StateName = Dict()
+
+
 """
    mydate(str)
    Turns a struing of the form 03/02/20  into 2-March-20
@@ -133,5 +149,12 @@ function axisMove(xd, yd; ax=nothing)
     return ax
 end
 
+
+function __init__()
+    for k in keys(stateName2Abbrev)
+        abbrev2StateName[stateName2Abbrev[k]] = k
+    end
+
+end
 
 end # ====== END MODULE ========
