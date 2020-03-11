@@ -20,7 +20,7 @@ This plot shows total number of confirmed cases, for the same countries as the f
 
 #### 2020-March-09 : Signs of a trend?
 
-Spain had a terrible day, Italy continues to rage unabated, but in the rest of Europe... noise? changes in testing? Or the beginning signs of a possibly encouraging trend? 
+~Spain had a terrible day, Italy continues to rage unabated, but in the rest of Europe... noise? changes in testing? Or the beginning signs of a possibly encouraging trend?~ Update: downwards trend went away after one day. Meant nothing.  :(
 
 #### 2020-March-06 : One possible conclusion
 
