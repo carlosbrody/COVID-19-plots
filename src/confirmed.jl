@@ -1,22 +1,35 @@
-include("utils.jl")
-
+using Revise
 using DelimitedFiles
+using Statistics
+
+push!(LOAD_PATH, ".")
+using CarlosUtils
+
 dname = "../../COVID-19/csse_covid_19_data/csse_covid_19_time_series"
 fname = "time_series_19-covid-Confirmed.csv"
 A  = readdlm("$dname/$fname", ',');
-# --- Special fix for occasional empty entries: copy previous day
+# --- Special fix for occasional empty entries: if not the US, then copy
+# previous day; if it is the US, enter zero, for it is a county row that has
+# noe been subsumed by state rows
 a = findall(A[:,5:end] .== "")
 for i=1:length(a)
-   A[a[i][1], a[i][2]+4] = A[a[i][1], a[i][2]+3]
+   if A[a[i][1],2] != "US"
+      # copy from previous day
+      A[a[i][1], a[i][2]+4] = A[a[i][1], a[i][2]+3]
+   else
+      # if US, enter zero, county rows are now superseded and subsumed in whole-state rows
+      A[a[i][1], a[i][2]+4] = 0     
+   end
 end
 # --- end fix
+
 
 # special code for all countries other than China:
 other = "World other than China"
 other_kwargs = Dict(:linewidth=>12, :color=>"gray", :alpha=>0.3)
 
 
-days_previous = 17
+days_previous = 18
 
 paises = ["South Korea", "Iran", "Italy", "Germany", "France", "Japan",
    "Spain", "US", "Switzerland", "UK", "Greece", "Mainland China", # "Other European Countries",
@@ -30,33 +43,44 @@ fontname       = "Helvetica Neue"
 fontsize       = 20
 legendfontsize = 13
 
+
+
 """
-   mydate(str)
-   Turns a struing of the form 03/02/20  into 2-March-20
+   fixNameChange!(oldname::String, newname::String)
+
+   Mutates A. Finds the row of A where the country is newname;
+   copies their non-zero counts columns into the row with oldname,
+   overwriting as it copies; then removes the row with newname.
+
+   Only works if there is only one oldname row and only one newname; checks for
+   that condition being true.
+
+   EXAMPLE:
+
+   fixNameChange!("South Korea", "Republic of Korea")
 """
-function mydate(str)
-   d = Date(str, "mm/dd/yy")
-   return "$(Dates.day(d))-$(Dates.monthname(d))-$(Dates.year(d))"
+function fixNameChange!(oldname::String, newname::String)
+   global A
+
+   u1 = findall(A[:,2] .== oldname)
+   @assert length(u1)==1 "more than 1 $oldname"
+   u1 = u1[1]
+
+   u2 = findall(A[:,2] .== newname)
+   @assert length(u2)==1 "more than 1 $newname"
+   u2 = u2[1]
+
+   # Copy non-zeros in row u2 to row u1
+   z = findall(A[u2,5:end] .> 0); A[u1,z.+4] = A[u2,z.+4]
+
+   # remove the newname row
+   A = A[setdiff(1:size(A,1), u2),:]
 end
 
-#
+fixNameChange!("South Korea", "Republic of Korea")
+fixNameChange!("Iran", "Iran (Islamic Republic of)")
 
-function smooth(s::Vector, k::Vector)
-   @assert isodd(length(k)) "k should have odd length"
 
-   mid = Int64((length(k)+1)/2)
-
-   sout = copy(s)
-   for i=1:length(s)
-      sguys = maximum([i-(mid-1), 1]) : minimum([i+(mid-1), length(s)])
-      kguys = sguys .- i .+ mid
-
-      sout[i] = sum(s[sguys].*k[kguys])./sum(k[kguys])
-   end
-   return sout
-end
-
-#
 
 # ###########################################
 #
@@ -217,7 +241,7 @@ while i <= 3
    end
 
    if ~isempty(plotted)
-      gca().legend(hs, plotted, fontsize=legendfontsize)
+      gca().legend(hs, plotted, fontsize=legendfontsize, loc="upper left")
       xlabel("days", fontname=fontname, fontsize=fontsize)
       ylabel("% daily growth", fontname=fontname, fontsize=fontsize)
       title("% daily growth in cumulative confirmed COVID-19 cases\n(smoothed with a +/- 1-day moving average; $minimum_cases cases minimum)",

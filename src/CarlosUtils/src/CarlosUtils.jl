@@ -1,3 +1,42 @@
+module CarlosUtils
+
+export mydate, smooth, axisWidthChange, axisHeightChange, axisMove
+
+"""
+   mydate(str)
+   Turns a struing of the form 03/02/20  into 2-March-20
+"""
+function mydate(str)
+   d = Date(str, "mm/dd/yy")
+   return "$(Dates.day(d))-$(Dates.monthname(d))-$(Dates.year(d))"
+end
+
+
+"""
+    smooth(s::Vector, k::Vector)
+
+    Convolves vector s with vector k. The vector k must be odd in length and the
+    center element corresponds to position 0. Treats edge effects gracefully and
+    returns a vector of same length as s
+"""
+function smooth(s::Vector, k::Vector)
+   @assert isodd(length(k)) "k should have odd length"
+
+   mid = Int64((length(k)+1)/2)
+
+   sout = copy(s)
+   for i=1:length(s)
+      sguys = maximum([i-(mid-1), 1]) : minimum([i+(mid-1), length(s)])
+      kguys = sguys .- i .+ mid
+
+      sout[i] = sum(s[sguys].*k[kguys])./sum(k[kguys])
+   end
+   return sout
+end
+
+
+
+
 """
 ax = axisWidthChange(factor; lock="c", ax=nothing)
 
@@ -93,3 +132,6 @@ function axisMove(xd, yd; ax=nothing)
     ax.set_position([x, y, w, h])
     return ax
 end
+
+
+end # ====== END MODULE ========
